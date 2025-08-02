@@ -3,8 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+
+  .navbar-custom {
+    background-color: #80807f;
+  }
+
+  .navbar-custom .navbar-brand {
+    color: #41be67;
+    font-weight: bold;
+  }
+
+  .navbar-custom .nav-link {
+    color: #ffffff;
+  }
+  .navbar-custom .nav-link:hover,
+  .navbar-custom .nav-link.active {
+    color: #41be67 !important;
+  }
+
+  .navbar-custom .navbar-toggler {
+    border-color: #41be67;
+  }
+  .navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,\
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'>\
+        <path stroke='#ffffff' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/>\
+      </svg>");
+  }
+</style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="index.html">AI Kitchen Assistant</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#mainNav"
+        aria-controls="mainNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="upload.html">Classify Produce</a></li>
+          <li class="nav-item"><a class="nav-link" href="cv_results.html">CV Results</a></li>
+          <li class="nav-item"><a class="nav-link" href="nlp_search.html">Recommend Recipes</a></li>
+          <li class="nav-item"><a class="nav-link" href="results.html">Recipe List</a></li>
+          <li class="nav-item"><a class="nav-link" href="recipe_detail.html">Recipe Detail</a></li>
+          <li class="nav-item"><a class="nav-link" href="report.html">Scientific Report</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+
+
+
+
+
 
 </body>
 </html>
