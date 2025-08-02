@@ -1,74 +1,319 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Pattern Recognition Project Report - Group 6</title>
     <style>
-
-  .navbar-custom {
-    background-color: #80807f;
-  }
-
-  .navbar-custom .navbar-brand {
-    color: #41be67;
-    font-weight: bold;
-  }
-
-  .navbar-custom .nav-link {
-    color: #ffffff;
-  }
-  .navbar-custom .nav-link:hover,
-  .navbar-custom .nav-link.active {
-    color: #41be67 !important;
-  }
-
-  .navbar-custom .navbar-toggler {
-    border-color: #41be67;
-  }
-  .navbar-custom .navbar-toggler-icon {
-    background-image: url("data:image/svg+xml;charset=utf8,\
-      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'>\
-        <path stroke='#ffffff' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/>\
-      </svg>");
-  }
-</style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1, h2, h3 { color: #2c3e50; }
+        h1 { border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        ul { margin-top: 0; }
+    </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">AI Kitchen Assistant</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#mainNav"
-        aria-controls="mainNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
 
-      <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="upload.html">Classify Produce</a></li>
-          <li class="nav-item"><a class="nav-link" href="cv_results.html">CV Results</a></li>
-          <li class="nav-item"><a class="nav-link" href="nlp_search.html">Recommend Recipes</a></li>
-          <li class="nav-item"><a class="nav-link" href="results.html">Recipe List</a></li>
-          <li class="nav-item"><a class="nav-link" href="recipe_detail.html">Recipe Detail</a></li>
-          <li class="nav-item"><a class="nav-link" href="report.html">Scientific Report</a></li>
+<h1>Pattern Recognition Project Report</h1>
+<p><strong>Team:</strong> Deepthika Sivaram & Derek Lu</p>
+<p><strong>Group:</strong> Group 6 — University at Buffalo</p>
+
+<h2>Phase 1: Data Collection</h2>
+<ul>
+  <li><strong>Classes:</strong> 4 fruits x 3 variants</li>
+  <li><strong>Fruits:</strong> Apple, Grapes, Peach, Raspberry</li>
+  <li><strong>Variants:</strong>
+    <ul>
+      <li>Apple: Whole, Sliced-Cored, In-Context</li>
+      <li>Grapes: In a Bag, Loose Grapes, On the Vine</li>
+      <li>Peach: Whole, Halved or Pitted, Sliced</li>
+      <li>Raspberry: Small Group, In a Container, Slightly Crushed</li>
+    </ul>
+  </li>
+  <li><strong>Total Images:</strong> ~12,000 (≈3,000 per fruit)</li>
+  <li><strong>File Format:</strong> JPEG and PNG</li>
+  <li><strong>Dimensions:</strong> 1200x1600 to 3024x4032</li>
+  <li><strong>Method:</strong> Hand-shot smartphone images under varied lighting and conditions</li>
+</ul>
+
+<h2>Phase 2: Computer Vision</h2>
+
+<p><strong>Objective:</strong> To quantitatively assess the quality, balance, and separability of our collected fruit images by training two transfer-learning based CNN classifiers.</p>
+
+<h3>Produce Classifier</h3>
+<ul>
+  <li>Fine-tune a pre-trained <strong>ResNet-50</strong> on four fruit classes: Apple, Grapes, Peach, Raspberry.</li>
+  <li>Evaluate using overall accuracy, per-class precision/recall/F₁, and confusion matrix.</li>
+</ul>
+
+<h3>Variation Classifier</h3>
+<ul>
+  <li>Fine-tune a pre-trained <strong>EfficientNet-B0</strong> for each fruit’s three photographic variants (Whole, Sliced/Cored, In-Context).</li>
+  <li>Evaluate using the same metrics to identify under-performing variants.</li>
+</ul>
+
+<h3>Methodology</h3>
+<ul>
+  <li><strong>Transfer Learning:</strong> ResNet-50 for produce, EfficientNet-B0 for variation.</li>
+  <li><strong>Configuration:</strong> Set <code>NUM_CLASSES</code>, <code>BATCH_SIZE</code>, <code>FRUIT</code>, and <code>MODE</code>.</li>
+  <li><strong>Dataloaders:</strong> <code>ImageFolder</code> with 80/20 <code>random_split</code>.</li>
+  <li><strong>Baseline Training:</strong> 10 epochs @ LR=1e-4.</li>
+  <li><strong>Fine-Tuning:</strong> 5 epochs @ LR=1e-5 with augmentations and early stopping at epoch 3.</li>
+</ul>
+
+<h3>Dataset Directory Structure</h3>
+<p>Removed batch subfolders. Dataset organized flat: 4 produce folders, each containing 3 variant subfolders (≈12 000 images total).</p>
+
+<h3>Pre-training Analysis</h3>
+<h4>ResNet-50 (Produce)</h4>
+<ul>
+  <li><strong>Apple:</strong> Precision=0.94, Recall=0.95, F₁=0.94</li>
+  <li><strong>Grapes:</strong> 0.96 / 0.93 / 0.94</li>
+  <li><strong>Peach:</strong> 0.99 / 0.99 / 0.99</li>
+  <li><strong>Raspberry:</strong> 0.98 / 1.00 / 0.99</li>
+  <li><strong>Strengths:</strong> Peach & Raspberry near-perfect; overall accuracy 97%.</li>
+  <li><strong>Weakness:</strong> Apple <->Grapes confusion (25 A→G, 36 G→A) and minor cross-class errors.</li>
+</ul>
+
+<h4>EfficientNet-B0 (Variation)</h4>
+<h5>Apple Variants</h5>
+<ul>
+  <li>Whole: 0.98 / 0.98 / 0.98</li>
+  <li>Sliced-Cored: 1.00 / 0.99 / 0.99</li>
+  <li>In-Context: 0.97 / 0.98 / 0.98</li>
+  <li>Errors: 1 In-Context→Sliced, 5 In-Context→Whole, 3 Sliced→(In-Context/Whole), 11 Whole→In-Context.</li>
+</ul>
+<h5>Grapes Variants</h5>
+<ul>
+  <li>In a Bag: 0.97 / 0.98 / 0.98</li>
+  <li>Loose Grapes: 1.00 / 0.99 / 0.99</li>
+  <li>On the Vine: 0.98 / 0.98 / 0.98</li>
+  <li>Errors: mix-ups between Bag, Loose, and Vine (total ≈8 misclassifications).</li>
+</ul>
+<h5>Peach Variants</h5>
+<ul>
+  <li>Halved/Pitted: 1.00 / 1.00 / 1.00</li>
+  <li>Sliced: 0.99 / 1.00 / 1.00</li>
+  <li>Whole: 0.99 / 0.98 / 0.99</li>
+  <li>Errors: 2 Sliced→Halved; others perfect.</li>
+</ul>
+<h5>Raspberry Variants</h5>
+<ul>
+  <li>In a Container: 1.00 / 1.00 / 1.00</li>
+  <li>Slightly Crushed: 1.00 / 1.00 / 1.00</li>
+  <li>Small Group: 1.00 / 1.00 / 1.00</li>
+  <li>No errors—perfect separation.</li>
+</ul>
+
+<h3>Fine Tuning 1</h3>
+<ul>
+  <li><strong>Augmentations:</strong> RandomResizedCrop, ColorJitter, Erasing.</li>
+  <li><strong>Run:</strong> 5 epochs @ LR=1e-5, early stopping @ epoch 3.</li>
+</ul>
+
+<h3>Fine Tuning 1 Analysis</h3>
+<h4>ResNet-50 (Produce)</h4>
+<ul>
+  <li>Apple: 0.96 / 0.95 / 0.95</li>
+  <li>Grapes: 0.94 / 0.96 / 0.95</li>
+  <li>Peach & Raspberry: 1.00 / 1.00 / 1.00</li>
+  <li>Confusion: 14 A→G, 21 G→A; no off-diagonal for Peach/Raspberry.</li>
+  <li>Weakness: Apple/Grapes still share color/shape cues in “Whole” form.</li>
+</ul>
+<h4>EfficientNet-B0 (Variation)</h4>
+<h5>Apple</h5>
+<ul>
+  <li>Whole: 0.98 / 0.98 / 0.98</li>
+  <li>In-Context: 0.97 / 0.98 / 0.98</li>
+  <li>Sliced-Cored: 1.00 / 0.99 / 0.99</li>
+  <li>Errors: 3 In-Context→Whole, 4 Whole→In-Context, 1 Sliced→In-Context, 2 Sliced→Whole.</li>
+</ul>
+<h5>Grapes</h5>
+<ul>
+  <li>On the Vine: 0.98 / 0.98 / 0.98</li>
+  <li>In a Bag: 0.97 / 0.98 / 0.98</li>
+  <li>Loose Grapes: 1.00 / 0.99 / 0.99</li>
+  <li>Errors: 1 Vine→Bag, 2 Vine→Loose.</li>
+</ul>
+<h5>Peach & Raspberry</h5>
+<ul>
+  <li>Peach Whole: 0.99 / 0.98 / 0.99; 2 Whole→Sliced errors.</li>
+  <li>Raspberry: perfect 1.00/1.00/1.00 separation.</li>
+</ul>
+
+<h2>Phase 3: Semantic Recipe Retrieval (NLP)</h2>
+<p><strong>Objective:</strong> The goal of the NLP phase was to design a BERT-based semantic search engine capable of recommending recipes based on ingredient and descriptor tags. The system needed to handle nuanced, multi-tag user queries and return ranked recipe suggestions from the RAW_recipes.csv and RAW_Interactions.csv dataset.</p>
+
+<h3>Methodology</h3>
+<ul>
+  <li>Data Preprocessing
+    <ul>
+      <li>Datasets Used:
+        <ul>
+          <li>RAW_recipes.csv: Provided recipe information including name, ingredients, steps, and tags.</li>
+          <li>RAW_interactions.csv: Contained user ratings which helped gauge recipe popularity or quality.</li>
         </ul>
-      </div>
-    </div>
-  </nav>
+      </li>
+      <li>Cleaning Steps:
+        <ul>
+          <li>Removed duplicates and recipes with missing essential fields (like ingredients or name).</li>
+          <li>Combined the ingredients, tags, and name fields into a unified text input for embedding.</li>
+          <li>Lowercased, tokenized, and filtered special characters and redundant whitespace.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Model Architecture
+    <ul>
+      <li><strong>Base Model:</strong> Fine-tuned sentence-transformers/all-MiniLM-L6-v2, a lightweight yet powerful model optimized for semantic search tasks.</li>
+      <li><strong>Training Objective:</strong> Constructed training pairs from user-tagged recipe preferences and designed the model to minimize the distance between relevant recipe vectors and query vectors in embedding space.</li>
+      <li><strong>Embedding Strategy:</strong> Used the transformer to embed both recipes and user queries (composed of 5–20 tags). Applied cosine similarity to compute closeness between queries and recipe embeddings. </li>
+    </ul>
+  </li>
+  </ul>
+
+<h3>Evaluation</h3>
+<h4>Test Query Set Design</h4>
+<p>To assess the model's robustness, we constructed a test set containing:</p>
+<ol>
+<li><strong>Ingredient-based queries</strong> (e.g., "chicken, rice")</li>
+<li><strong>Conceptual and subjective terms</strong> (e.g., "healthy dinner", "quick snacks", "seasonal recipes")</li>
+<li><strong>Combined queries</strong> (e.g., "vegan soup quick", "low-carb dinner healthy")</li>
+</ol>
+<p>These were selected to probe both surface-level retrieval and semantic understanding.</p>
+
+<h4>Recommendation Output Review</h4>
+
+<h5>1. Simple Ingredient Queries</h5>
+<ul>
+<li><strong>Query</strong>: "chicken, rice"<br>
+    <strong>Recommendation</strong>: Chicken and Rice Casserole, Avg. Rating: 4.8<br>
+    <em>Relevance</em>: High<br>
+     <em>Insightfulness</em>: Includes variations and prep guidance
+</li>
+<li><strong>Query</strong>: "tomato, pasta"<br>
+    <strong>Recommendation</strong>: Tomato Basil Pasta<br>
+     <em>Relevance</em>: Strong match<br>
+     <em>Creativity</em>: Basic recommendation
+</li>
+</ul>
+
+<h5>2. Abstract/Conceptual Queries</h5>
+<ul>
+<li><strong>Query</strong>: "healthy dinner"<br>
+    <strong>Recommendation</strong>: Grilled Chicken with Steamed Vegetables<br>
+     <em>Relevance</em>: Matches low-fat pattern<br>
+     <em>Transparency</em>: No nutrition data cited
+</li>
+<li><strong>Query</strong>: "quick lunch"<br>
+    <strong>Recommendation</strong>: Tuna Salad Sandwich<br>
+     <em>Time</em>: Under 15 minutes<br>
+     <em>Appropriateness</em>: Good match
+</li>
+<li><strong>Query</strong>: "seasonal winter soup"<br>
+    <strong>Recommendation</strong>: Butternut Squash Soup<br>
+     <em>Semantic Match</em>: Correct seasonal dish<br>
+     <em>Context Sensitivity</em>: Season logic not applied
+</li>
+</ul>
+
+<h4>Success and Failure Patterns</h4>
+<table border="1" cellpadding="5">
+<tr><th>Query Type</th><th>Success Case</th><th>Failure Case</th><th>Notes</th></tr>
+<tr><td>Ingredient Matching</td><td>"chicken rice" → Chicken & Rice Casserole</td><td>"peach thyme" → Dessert without thyme</td><td>Strong for simple matches</td></tr>
+<tr><td>Healthy Concepts</td><td>"low calorie lunch" → Grilled Fish Salad</td><td>"heart healthy" → Pasta Alfredo</td><td>Subjective term inference limited</td></tr>
+<tr><td>Time Constraints</td><td>"quick snacks" → Peanut Butter Banana Bites</td><td>"10 minute meal" → Took 30+ mins</td><td>No prep time filter</td></tr>
+<tr><td>Seasonal Reasoning</td><td>"fall desserts" → Pumpkin Pie</td><td>"spring stew" → Winter recipes</td><td>Lacks season metadata</td></tr>
+</table>
+
+<h4>Limitations</h4>
+<ul>
+<li>No use of structured metadata (e.g., cook time, nutrition)</li>
+<li>Abstract concepts are inferred, not validated</li>
+<li>Failures due to ambiguous/compound terms</li>
+</ul>
+
+<h3>Conclusion</h3>
+<p>The model performs well for ingredient queries and somewhat for conceptual inputs. Future improvements should include structured metadata and post-filtering based on user goals to boost relevance and trust.</p>
 
 
+<h2>Phase 4: Web Application Deployment</h2>
+
+<p><strong>Objective:</strong> The goal of this phase was to create a polished, static web application that integrates both our Computer Vision (CV) and Natural Language Processing (NLP) models into a seamless, interactive platform. This web app serves as the unified demonstration and delivery mechanism for our project, hosted publicly on Render.com.</p>
+
+<p><strong>Live Deployment:</strong> <a href="https://patternrec-project-group6.onrender.com/" target="_blank">https://patternrec-project-group6.onrender.com/</a></p>
+
+<p><strong>GitHub Repository:</strong> <a href="https://github.com/deepthika-sivaram/PatternRec_Project_Group6/tree/main" target="_blank">PatternRec_Project_Group6</a></p>
+
+<h3>Team Responsibilities</h3>
+<table border="1" cellpadding="6" cellspacing="0">
+  <tr>
+    <th>Role</th>
+    <th>Member</th>
+    <th>Responsibilities</th>
+  </tr>
+  <tr>
+    <td>CV Engineer</td>
+    <td>Derek Lu</td>
+    <td>Developed the front-end interface for image upload and fruit/variant classification</td>
+  </tr>
+  <tr>
+    <td>NLP Engineer</td>
+    <td>Deepthika Sivaram</td>
+    <td>Built the interface for tag-based recipe recommendations using a BERT model</td>
+  </tr>
+  <tr>
+    <td>Joint Tasks</td>
+    <td>Both</td>
+    <td>Co-designed layout, styling, and integrated the written scientific report</td>
+  </tr>
+</table>
+
+<h3>System Overview</h3>
+<ul>
+  <li>Frontend: Hybrid HTML interface combining static JS/CV output and Flask-rendered NLP forms</li>
+  <li>CV Models: Exported to ONNX and executed in-browser using ONNX.js and JavaScript</li>
+  <li>NLP Models: Deployed on Flask server and served via HTML templating</li>
+  <li>Workflow:
+    <ul>
+      <li>User uploads a photo → ONNX.js classifies fruit type and variant in browser</li>
+      <li>User enters tags → Flask application processes with BERT and returns top-ranked recipes</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>Architecture Diagram</h3>
+<pre>
+[User] → [Upload Image / Input Tags]
+      ↘                           ↙
+   [CV Frontend]          [NLP Frontend]
+      ↓                           ↓
+[CV ONNX Model]       [NLP BERT Model]
+      ↓                           ↓
+  [Fruit/Variant]        [Top-K Recipes]
+          ↘               ↙
+     [Unified Display & Report Integration]
+</pre>
+
+<h3>Highlights</h3>
+<ul>
+  <li>Seamless integration of CV and NLP in a single-page React app</li>
+  <li>Real-time classification and recipe recommendation experience</li>
+  <li>Static deployment with ONNX.js for efficient client-side inference</li>
+  <li>Scientific reporting embedded alongside interactive demos</li>
+</ul>
+
+<h3>Limitations & Future Work</h3>
+<ul>
+  <li>Client-side ONNX may have latency on large models—future work may include backend inference support</li>
+  <li>Currently uses pre-exported embeddings and sample inference—future versions may support dynamic user input processing</li>
+</ul>
+
+<h3>Conclusion</h3>
+<p>This deployment phase successfully unified the two core machine learning components of our project into a single, user-accessible interface. The web application not only demonstrates technical proficiency in React and ONNX deployment but also enhances transparency and reproducibility through embedded scientific reporting. The Render-hosted solution provides an easily shareable and scalable showcase of our work.</p>
 
 
-
-
-
+<h2>Conclusion</h2>
+<p>This project successfully integrated Computer Vision and NLP systems into a unified, end-user application. High model performance and seamless web deployment reflect the robustness of both dataset design and implementation strategy.</p>
 
 </body>
 </html>
