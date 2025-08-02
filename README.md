@@ -4,5 +4,6 @@ Project Members: Deepthika Sivaram and Derek Lu
 GitHub Pages Link:
 https://derekklue.github.io/PatternRec_Project_Group6/index.html 
 
-Deepthika's render link
+Deepthika's repo link:
+https://github.com/deepthika-sivaram/PatternRec_Project_Group6
 https://patternrec-project-group6.onrender.com/
