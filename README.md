@@ -1,6 +1,7 @@
 # PatternRec_Project_Group6
-Deepthika Sivaram
-Derek Lu
+Project Members: Deepthika Sivaram and Derek Lu
+
+GitHub Pages Link:
 https://derekklue.github.io/PatternRec_Project_Group6/index.html 
 
 Deepthika's render link
